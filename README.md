@@ -1,6 +1,6 @@
 # Ubuntu Phone Compute Bridge
 
-A public proof of a bounded remote-compute protocol intended for a Windows controller and a phone-hosted Ubuntu environment. The repository demonstrates the controller, named-job contract, structured-result validation, and integrity checks; it does **not** prove or expose a live phone deployment.
+A bounded remote-compute protocol intended for a Windows controller and a phone-hosted Ubuntu environment. The repository demonstrates the controller, named-job contract, structured-result validation, and integrity checks; it does **not** prove or expose a live phone deployment.
 
 ![Protocol boundary diagram](docs/workflow.svg)
 
