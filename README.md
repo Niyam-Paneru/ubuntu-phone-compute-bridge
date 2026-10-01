@@ -1,56 +1,35 @@
 # Ubuntu Phone Compute Bridge
 
-**Yes, the phone is a computer. No, it does not get arbitrary-command privileges.**
+**Yes, the phone is a computer. No, that does not mean every string deserves to become a command.**
 
-This repo is a sanitized public slice of my `niyam-lab` work: a Windows controller that can send only a tiny allowlist of jobs to Ubuntu running inside Termux on Android, then verify what came back.
+This is a sanitized public slice of my Niyam Lab work: a Windows controller sends a small set of named jobs to Ubuntu running on an Android phone, then checks the result before trusting it.
 
-## Route
+## The shape
 
-```mermaid
-flowchart LR
-    W[Windows controller] -->|SSH, strict host key| T[Termux sshd]
-    T --> U[Ubuntu / proot-distro]
-    U --> J{Allowlisted job}
-    J -->|health| H[Health JSON]
-    J -->|python-smoke| P[Python result]
-    J -->|benchmark| B[Benchmark result]
-    J -->|setup| S[Workspace check]
-    H --> V[Validate + save]
-    P --> V
-    B --> V
-    S --> V
-```
+**Windows → attended transport → Android/Termux → Ubuntu userspace → named job → structured result**
 
-There is deliberately no “run arbitrary command” box. That feature is called SSH, and it already exists.
+The interesting part is not “remote execution.” Tools already exist for that.
 
-## What this proves
+The interesting part is keeping the bridge boring enough to review:
 
-- fixed job allowlist;
-- strict host-key checking;
-- bounded SSH connection settings;
-- no silent Windows fallback when the phone job fails;
-- structured result validation;
-- SHA-256 integrity helper for returned artifacts;
-- explicit execution-location marker.
+- jobs come from a fixed registry;
+- each job has a small purpose and time budget;
+- returned results must identify the job and execution location;
+- artifact bytes can be checked against an expected digest;
+- remote failure stays a failure instead of quietly becoming a local fallback.
 
-## Windows example
+## Repo map
 
-```powershell
-.\windows\Invoke-SafeUbuntuJob.ps1 -Job health -HostAddress 192.0.2.10 -User termux_user -IdentityFile "$HOME\.ssh\phone_lab_ed25519"
-```
+| Area | Responsibility |
+|---|---|
+| `jobs.py` | named jobs and their limits |
+| `results.py` | structured result validation |
+| `integrity.py` | artifact digest checks |
+| `protocol.py` | stable public facade |
+| `windows/` | bounded controller example |
+| `tests/` | allowlist, result, and integrity behavior |
+| `docs/` | design reasoning |
 
-`192.0.2.10` is an RFC 5737 documentation address. Replace it with your own LAN address.
+The private lab contains the actual device setup, recovery notes, and additional experiments. None of those machine-specific details belong in a public proof repo.
 
-## Verify locally
-
-```bash
-PYTHONPATH=src python -m unittest discover -s tests
-```
-
-## Boundary
-
-This repo does not expose a server, open router ports, root Android, ship SSH keys, or accept arbitrary remote commands.
-
-## Provenance
-
-Sanitized and rewritten from the private `niyam-lab` controller. The private project also contains Android/Termux setup, benchmarking, recovery tooling, and additional local experiments.
+> Tiny computer, normal-sized trust boundary.
