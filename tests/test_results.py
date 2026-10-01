@@ -32,6 +32,15 @@ class ResultTests(unittest.TestCase):
         )
         self.assertTrue(result["ok"])
 
+    def test_oversized_result_is_rejected_before_parsing(self):
+        payload = '{"job":"health","execution_location":"phone-ubuntu","ok":true,"pad":"' + ("x" * 200) + '"}'
+        with self.assertRaisesRegex(ValueError, "result_too_large"):
+            parse_result(payload, expected_job="health", max_bytes=64)
+
+    def test_invalid_result_size_limit_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "invalid_result_size_limit"):
+            parse_result("{}", expected_job="health", max_bytes=0)
+
 
 if __name__ == "__main__":
     unittest.main()
