@@ -20,8 +20,12 @@ JOB_SPECS = {
 ALLOWED_JOBS = frozenset(JOB_SPECS)
 
 
-def validate_job(job: str) -> JobSpec:
-    try:
-        return JOB_SPECS[job]
-    except KeyError as error:
-        raise ValueError("job_not_allowlisted") from error
+def validate_job(job: str) -> str:
+    if job not in ALLOWED_JOBS:
+        raise ValueError("job_not_allowlisted")
+    return job
+
+
+def job_spec(job: str) -> JobSpec:
+    validate_job(job)
+    return JOB_SPECS[job]
