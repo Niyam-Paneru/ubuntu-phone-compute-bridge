@@ -37,3 +37,12 @@ The private lab contains the actual device setup, recovery notes, and additional
 Want to verify the boundary instead of admiring the phone? Read the [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [job contract](docs/job-contract.md), and [walkthrough](docs/walkthrough.md).
 
 > Tiny computer, normal-sized trust boundary.
+
+## Inspect deeper
+
+- [Design overview](docs/overview.md)
+- [Why the design looks this way](docs/decisions.md)
+- [How it fails on purpose](docs/failure-modes.md)
+- [Security / privacy boundary](SECURITY.md)
+
+The README is the front door. The interesting arguments are in those files.
