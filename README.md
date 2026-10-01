@@ -42,7 +42,9 @@ Want to verify the boundary instead of admiring the phone? Read the [invariants]
 
 - [Design overview](docs/overview.md)
 - [Why the design looks this way](docs/decisions.md)
+- [Invariants that must survive refactors](docs/invariants.md)
 - [How it fails on purpose](docs/failure-modes.md)
 - [Security / privacy boundary](SECURITY.md)
+- [Where this public slice came from](PROVENANCE.md)
 
 The README is the front door. The interesting arguments are in those files.
