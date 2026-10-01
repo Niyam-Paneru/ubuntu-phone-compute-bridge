@@ -6,9 +6,15 @@ build-backend = "setuptools.build_meta"
 name = "ubuntu-phone-compute-bridge"
 version = "0.1.0"
 description = "A bounded Windows-to-Android/Ubuntu compute bridge with named jobs and explicit result verification."
+readme = "README.md"
+authors = [{ name = "Niyam Paneru" }]
 requires-python = ">=3.10"
 license = { text = "MIT" }
 keywords = ["android","ubuntu","remote-execution","allowlist","integrity"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.urls]
+Homepage = "https://github.com/Niyam-Paneru/ubuntu-phone-compute-bridge"
+Source = "https://github.com/Niyam-Paneru/ubuntu-phone-compute-bridge"
