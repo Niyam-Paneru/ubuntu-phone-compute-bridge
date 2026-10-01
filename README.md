@@ -4,6 +4,8 @@
 
 This is a sanitized public slice of my Niyam Lab work: a Windows controller sends a small set of named jobs to Ubuntu running on an Android phone, then checks the result before trusting it.
 
+![Phone compute architecture](docs/workflow.svg)
+
 ## The shape
 
 **Windows → attended transport → Android/Termux → Ubuntu userspace → named job → structured result**
