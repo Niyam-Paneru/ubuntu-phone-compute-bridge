@@ -1,27 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="t d">
-<title id="t">Ubuntu phone compute workflow</title>
-<desc id="d">A Windows controller selects a named job, an attended phone worker runs it, and the structured result is verified.</desc>
-<rect width="1200" height="320" fill="#0b1020"/>
-<text x="56" y="52" fill="#f8fafc" font-family="Arial,sans-serif" font-size="28" font-weight="700">The phone is a worker, not a mystery box.</text>
-<g font-family="Arial,sans-serif">
-  <rect x="60" y="125" width="220" height="92" rx="18" fill="#111827" stroke="#60a5fa" stroke-width="3"/>
-  <text x="170" y="160" text-anchor="middle" fill="#dbeafe" font-size="20" font-weight="700">Windows</text>
-  <text x="170" y="190" text-anchor="middle" fill="#94a3b8" font-size="14">choose named job</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="t d">
+<title id="t">Ubuntu phone compute bridge</title><desc id="d">A Windows controller chooses a named job, sends it over a bounded bridge to phone Ubuntu, and validates the structured result.</desc>
+<rect width="1200" height="520" fill="#f5f5f1"/>
+<text x="56" y="62" fill="#71716a" font-family="Arial,sans-serif" font-size="13" letter-spacing="3">PHONE COMPUTE BRIDGE</text>
+<text x="56" y="105" fill="#171714" font-family="Georgia,serif" font-size="34">The phone is a worker, not a mystery shell.</text>
 
-  <rect x="350" y="125" width="220" height="92" rx="18" fill="#111827" stroke="#38bdf8" stroke-width="3"/>
-  <text x="460" y="160" text-anchor="middle" fill="#e0f2fe" font-size="20" font-weight="700">attended link</text>
-  <text x="460" y="190" text-anchor="middle" fill="#94a3b8" font-size="14">bounded transport</text>
+<rect x="58" y="170" width="220" height="110" rx="16" fill="#fff" stroke="#171714" stroke-width="2"/>
+<text x="82" y="202" fill="#71716a" font-family="Arial,sans-serif" font-size="12" letter-spacing="2">WINDOWS</text>
+<text x="82" y="235" fill="#171714" font-family="Georgia,serif" font-size="24">Choose named job.</text>
+<text x="82" y="263" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">no free-form command field</text>
 
-  <rect x="640" y="125" width="220" height="92" rx="18" fill="#111827" stroke="#a78bfa" stroke-width="3"/>
-  <text x="750" y="160" text-anchor="middle" fill="#ede9fe" font-size="20" font-weight="700">phone Ubuntu</text>
-  <text x="750" y="190" text-anchor="middle" fill="#94a3b8" font-size="14">allowlisted task</text>
+<rect x="355" y="145" width="235" height="160" rx="16" fill="#fff" stroke="#171714" stroke-width="2"/>
+<text x="380" y="178" fill="#71716a" font-family="Arial,sans-serif" font-size="12" letter-spacing="2">BRIDGE</text>
+<text x="380" y="211" fill="#171714" font-family="Georgia,serif" font-size="24">Bounded transport.</text>
+<text x="380" y="248" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">strict host identity</text>
+<text x="380" y="273" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">small connection limits</text>
 
-  <rect x="930" y="125" width="220" height="92" rx="18" fill="#111827" stroke="#4ade80" stroke-width="3"/>
-  <text x="1040" y="160" text-anchor="middle" fill="#dcfce7" font-size="20" font-weight="700">verify result</text>
-  <text x="1040" y="190" text-anchor="middle" fill="#94a3b8" font-size="14">job · location · digest</text>
-</g>
-<g stroke="#475569" stroke-width="4" fill="none">
-  <path d="M280 171 H350"/><path d="M570 171 H640"/><path d="M860 171 H930"/>
-</g>
-<text x="1140" y="282" fill="#64748b" font-family="Arial,sans-serif" font-size="13" text-anchor="end">If the remote side fails, pretending Windows did it is not “resilience.”</text>
+<rect x="665" y="145" width="235" height="160" rx="16" fill="#fff" stroke="#171714" stroke-width="2"/>
+<text x="690" y="178" fill="#71716a" font-family="Arial,sans-serif" font-size="12" letter-spacing="2">PHONE UBUNTU</text>
+<text x="690" y="211" fill="#171714" font-family="Georgia,serif" font-size="24">Run reviewed work.</text>
+<text x="690" y="248" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">health</text>
+<text x="750" y="248" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">smoke</text>
+<text x="810" y="248" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">benchmark</text>
+
+<rect x="975" y="170" width="170" height="110" rx="16" fill="#e4edb0" stroke="#596e35" stroke-width="2"/>
+<text x="1000" y="202" fill="#596e35" font-family="Arial,sans-serif" font-size="12" letter-spacing="2">RESULT</text>
+<text x="1000" y="235" fill="#171714" font-family="Georgia,serif" font-size="22">Verify proof.</text>
+<text x="1000" y="263" fill="#4e4e48" font-family="Arial,sans-serif" font-size="14">job · location · digest</text>
+
+<g stroke="#171714" stroke-width="2" fill="none"><path d="M278 225 H355"/><path d="M590 225 H665"/><path d="M900 225 H975"/></g>
+<g fill="#171714"><path d="M347 219 l10 6 -10 6z"/><path d="M657 219 l10 6 -10 6z"/><path d="M967 219 l10 6 -10 6z"/></g>
+
+<rect x="355" y="365" width="545" height="70" rx="14" fill="#262722"/>
+<text x="380" y="394" fill="#d8d8d1" font-family="Arial,sans-serif" font-size="12" letter-spacing="2">NO SILENT FALLBACK</text>
+<text x="380" y="420" fill="#fff" font-family="Georgia,serif" font-size="19">If the phone fails, Windows does not pretend it succeeded.</text>
 </svg>
