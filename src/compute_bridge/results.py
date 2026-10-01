@@ -6,10 +6,22 @@ from .jobs import validate_job
 
 
 EXPECTED_LOCATION = "phone-ubuntu"
+RESULT_MAX_BYTES = 64 * 1024
 
 
-def parse_result(payload: str, *, expected_job: str) -> dict:
+def parse_result(
+    payload: str,
+    *,
+    expected_job: str,
+    max_bytes: int = RESULT_MAX_BYTES,
+) -> dict:
     validate_job(expected_job)
+
+    if max_bytes < 1:
+        raise ValueError("invalid_result_size_limit")
+    if len(payload.encode("utf-8")) > max_bytes:
+        raise ValueError("result_too_large")
+
     data = json.loads(payload)
 
     if not isinstance(data, dict):
