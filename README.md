@@ -1,50 +1,62 @@
 # Ubuntu Phone Compute Bridge
 
-**Yes, the phone is a computer. No, that does not mean every string deserves to become a command.**
+A public proof of a bounded Windows → Android/Termux → Ubuntu compute contract. The Windows controller selects one reviewed job, invokes it through a constrained SSH example, and returns structured remote output; the Python package separately validates job identity, execution location, success state, result size, and optional artifact digests.
 
-This is a sanitized public slice of my Niyam Lab work: a Windows controller sends a small set of named jobs to Ubuntu running on an Android phone, then checks the result before trusting it.
+![Protocol boundary diagram](docs/workflow.svg)
 
-![Phone compute architecture](docs/workflow.svg)
+## What is actually implemented
 
-## The shape
+- [`windows/Invoke-SafeUbuntuJob.ps1`](windows/Invoke-SafeUbuntuJob.ps1) is the concrete Windows controller example. It exposes only `health`, `python-smoke`, `benchmark`, and `setup`; requires an explicit IPv4 target, user, and identity file; enables strict host-key checking and bounded connection settings; and throws when SSH fails.
+- [`src/compute_bridge/jobs.py`](src/compute_bridge/jobs.py) defines the same small public job registry plus descriptive `max_seconds` metadata.
+- [`src/compute_bridge/results.py`](src/compute_bridge/results.py) rejects results that are too large, are not JSON objects, identify the wrong job or execution location, or do not report `ok: true`.
+- [`src/compute_bridge/integrity.py`](src/compute_bridge/integrity.py) provides SHA-256 artifact verification when returned bytes have an expected digest.
 
-**Windows → attended transport → Android/Termux → Ubuntu userspace → named job → structured result**
+One boundary is intentionally visible rather than hidden: the PowerShell example emits the remote stdout as-is. It does **not** call the Python validator itself. A caller that wants verified success must pass that payload through `parse_result(...)` before trusting it.
 
-The interesting part is not “remote execution.” Tools already exist for that.
+## Protocol contract
 
-The interesting part is keeping the bridge boring enough to review:
+A request is a reviewed job selection, not an arbitrary shell string. For example:
 
-- jobs come from a fixed registry;
-- each job has a small purpose and time budget;
-- returned results must identify the job and execution location;
-- artifact bytes can be checked against an expected digest;
-- remote failure stays a failure instead of quietly becoming a local fallback.
+```text
+-Job health
+```
 
-## Repo map
+A synthetic valid remote result is:
 
-| Area | Responsibility |
+```json
+{"job":"health","execution_location":"phone-ubuntu","ok":true}
+```
+
+The Python verifier accepts that result only when the expected job is allowlisted, the UTF-8 payload is within the 64 KiB bound, `job` matches the request, `execution_location` is exactly `phone-ubuntu`, and `ok` is exactly `true`.
+
+Artifact verification is a separate check: `verify_artifact(bytes, expected_sha256)` compares the returned bytes with the expected SHA-256 digest. The PowerShell example does not currently return an artifact or wire this digest check automatically.
+
+## Failure behavior
+
+| Failure | Result |
 |---|---|
-| `jobs.py` | named jobs and their limits |
-| `results.py` | structured result validation |
-| `integrity.py` | artifact digest checks |
-| `protocol.py` | stable public facade |
-| `windows/` | bounded controller example |
-| `tests/` | allowlist, result, and integrity behavior |
-| `docs/` | design reasoning |
+| unknown job name | rejected by the allowlist |
+| missing identity file | controller throws before SSH |
+| host identity mismatch | strict host-key checking stops the SSH connection |
+| non-zero SSH exit | controller throws; no local fallback |
+| wrong job or execution location | `parse_result` rejects |
+| `ok` is false | `parse_result` rejects |
+| result exceeds the configured byte bound | rejected before JSON parsing |
+| artifact digest mismatch | `verify_artifact` returns false |
 
-The private lab contains the actual device setup, recovery notes, and additional experiments. None of those machine-specific details belong in a public proof repo.
+Remote failure is not converted into a plausible local Windows success path anywhere in this public controller.
 
-Want to verify the boundary instead of admiring the phone? Read the [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [job contract](docs/job-contract.md), and [walkthrough](docs/walkthrough.md).
+## Verify the public slice
 
-> Tiny computer, normal-sized trust boundary.
+```bash
+python -m compileall -q src
+PYTHONPATH=src python -m unittest discover -s tests -v
+```
 
-## Inspect deeper
+The behavior suite covers the four-job allowlist, result identity/location checks, explicit remote failure rejection, the result-size limit, deterministic SHA-256 hashing, and tamper detection.
 
-- [Design overview](docs/overview.md)
-- [Why the design looks this way](docs/decisions.md)
-- [Invariants that must survive refactors](docs/invariants.md)
-- [How it fails on purpose](docs/failure-modes.md)
-- [Security / privacy boundary](SECURITY.md)
-- [Where this public slice came from](PROVENANCE.md)
+## Scope and provenance
 
-The README is the front door. The interesting arguments are in those files.
+This repository contains no SSH private key, password, device address, host fingerprint, router configuration, or live remote-access endpoint. The private lab contains the actual device setup and recovery details. This public slice demonstrates the controller/protocol boundaries; it does not publish a persistent worker service or claim that the example exposes live phone access.
+
+For the narrower contracts, see [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [job contract](docs/job-contract.md), [walkthrough](docs/walkthrough.md), [security boundary](SECURITY.md), and [provenance](PROVENANCE.md).
