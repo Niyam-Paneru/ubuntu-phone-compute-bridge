@@ -34,4 +34,6 @@ The interesting part is keeping the bridge boring enough to review:
 
 The private lab contains the actual device setup, recovery notes, and additional experiments. None of those machine-specific details belong in a public proof repo.
 
+Want to verify the boundary instead of admiring the phone? Read the [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [job contract](docs/job-contract.md), and [walkthrough](docs/walkthrough.md).
+
 > Tiny computer, normal-sized trust boundary.
