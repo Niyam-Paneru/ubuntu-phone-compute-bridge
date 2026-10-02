@@ -1,50 +1,58 @@
 # Ubuntu Phone Compute Bridge
 
-**Yes, the phone is a computer. No, that does not mean every string deserves to become a command.**
+A bounded remote-compute protocol intended for a Windows controller and a phone-hosted Ubuntu environment. The repository demonstrates the controller, named-job contract, structured-result validation, and integrity checks; it does **not** prove or expose a live phone deployment.
 
-This is a sanitized public slice of my Niyam Lab work: a Windows controller sends a small set of named jobs to Ubuntu running on an Android phone, then checks the result before trusting it.
+![Protocol boundary diagram](docs/workflow.svg)
 
-![Phone compute architecture](docs/workflow.svg)
+## What is implemented
 
-## The shape
+- [`windows/Invoke-SafeUbuntuJob.ps1`](windows/Invoke-SafeUbuntuJob.ps1) accepts only four named jobs, requires explicit connection inputs, uses strict host-key checking, and throws on SSH failure.
+- [`src/compute_bridge/jobs.py`](src/compute_bridge/jobs.py) defines the matching public job registry.
+- [`src/compute_bridge/results.py`](src/compute_bridge/results.py) validates payload size, job identity, execution location, and `ok: true`.
+- [`src/compute_bridge/integrity.py`](src/compute_bridge/integrity.py) verifies optional SHA-256 artifact digests.
 
-**Windows → attended transport → Android/Termux → Ubuntu userspace → named job → structured result**
+The PowerShell example returns remote stdout as-is. It does **not** automatically call the Python validator, so verified success requires the caller to pass that payload through `parse_result(...)`.
 
-The interesting part is not “remote execution.” Tools already exist for that.
+## Protocol example
 
-The interesting part is keeping the bridge boring enough to review:
+Request:
 
-- jobs come from a fixed registry;
-- each job has a small purpose and time budget;
-- returned results must identify the job and execution location;
-- artifact bytes can be checked against an expected digest;
-- remote failure stays a failure instead of quietly becoming a local fallback.
+```text
+-Job health
+```
 
-## Repo map
+Synthetic valid result:
 
-| Area | Responsibility |
+```json
+{"job":"health","execution_location":"phone-ubuntu","ok":true}
+```
+
+`parse_result(...)` accepts it only when the requested job is allowlisted, the payload is within 64 KiB, the job matches, the claimed execution location is exactly `phone-ubuntu`, and `ok` is exactly `true`.
+
+## Failure behavior
+
+| Failure | Result |
 |---|---|
-| `jobs.py` | named jobs and their limits |
-| `results.py` | structured result validation |
-| `integrity.py` | artifact digest checks |
-| `protocol.py` | stable public facade |
-| `windows/` | bounded controller example |
-| `tests/` | allowlist, result, and integrity behavior |
-| `docs/` | design reasoning |
+| unknown job | allowlist rejection |
+| missing identity file | stop before SSH |
+| host-key mismatch | SSH refuses the connection |
+| non-zero SSH exit | controller throws; no local fallback |
+| wrong job/location, false `ok`, oversized result | `parse_result` rejects |
+| artifact digest mismatch | `verify_artifact` returns false |
 
-The private lab contains the actual device setup, recovery notes, and additional experiments. None of those machine-specific details belong in a public proof repo.
+Remote failure is never converted into a local Windows success path by this controller.
 
-Want to verify the boundary instead of admiring the phone? Read the [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [job contract](docs/job-contract.md), and [walkthrough](docs/walkthrough.md).
+## Verify
 
-> Tiny computer, normal-sized trust boundary.
+```bash
+python -m compileall -q src
+PYTHONPATH=src python -m unittest discover -s tests -v
+```
 
-## Inspect deeper
+The tests cover the four-job allowlist, result identity/location checks, remote-failure rejection, the size bound, SHA-256 hashing, and tamper detection.
 
-- [Design overview](docs/overview.md)
-- [Why the design looks this way](docs/decisions.md)
-- [Invariants that must survive refactors](docs/invariants.md)
-- [How it fails on purpose](docs/failure-modes.md)
-- [Security / privacy boundary](SECURITY.md)
-- [Where this public slice came from](PROVENANCE.md)
+## Scope
 
-The README is the front door. The interesting arguments are in those files.
+No SSH key, password, device address, host fingerprint, router configuration, live endpoint, persistent worker service, or live phone-access claim is included.
+
+See [job contract](docs/job-contract.md), [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [security boundary](SECURITY.md), and [provenance](PROVENANCE.md).

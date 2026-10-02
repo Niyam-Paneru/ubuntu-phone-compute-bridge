@@ -1,19 +1,9 @@
 # Provenance
 
-This public module was rewritten from my private Niyam Lab experiments using an Android phone as a bounded Ubuntu compute worker.
+The code comes from private experiments using a phone-hosted Ubuntu environment as a bounded compute target.
 
-## Preserved
+The public repository keeps the pieces that are safe and independently reviewable: four named jobs, a Windows PowerShell controller example, structured result validation, execution-location checks, SHA-256 artifact verification, and explicit remote-failure handling.
 
-- small named-job registry;
-- explicit execution-location proof;
-- result validation;
-- artifact digest verification;
-- no silent local fallback.
+Machine-specific material is excluded: SSH keys, addresses, host fingerprints, router configuration, device setup, recovery steps, and any live remote-access path.
 
-## Rewritten for public review
-
-SSH keys, addresses, host fingerprints, device setup, network configuration, and personal machine details are omitted.
-
-## Claim boundary
-
-The repository demonstrates the controller/worker contract. It does not expose a live remote-access path to my phone.
+This repository demonstrates the controller/protocol contract. It does not demonstrate that a phone is currently reachable or running a persistent worker service.
