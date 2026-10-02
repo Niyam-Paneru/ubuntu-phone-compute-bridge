@@ -1,46 +1,64 @@
 # Ubuntu Phone Compute Bridge
 
-A bounded remote-compute protocol intended for a Windows controller and a phone-hosted Ubuntu environment. It exposes a reviewed named-job contract, structured result validation, and optional artifact integrity checks; it does **not** prove or expose a live phone deployment.
+A bounded remote-compute protocol for a Windows controller and a phone-hosted Ubuntu environment: reviewed named jobs, structured results, and optional artifact integrity checks.
 
-The phone is allowed to fail. The controller is not allowed to improvise a Windows victory and call it remote compute.
+**The phone may fail. A victory quietly computed on Windows does not count.**
+
+This public sample comes from my private remote-compute experiments. It exposes the controller and result contract for review. I can build and adapt the surrounding job workflows, device setup, and application integrations; this repo makes no claim that a phone is currently reachable.
+
+## Transport: remote failure stays a failure
 
 ```mermaid
 sequenceDiagram
     participant C as Caller
     participant W as Windows controller
-    participant S as SSH boundary
-    participant P as phone-Ubuntu named job
-    participant V as caller-side Python
+    participant P as Phone Ubuntu
 
-    C->>W: Request named job
-    alt job is not allowlisted
-        W-->>C: Reject before SSH
-    else allowlisted job
-        W->>S: ssh.exe + explicit connection inputs
-        S->>P: Run mapped named job
+    C->>W: <b>Request named job</b>
+    alt Invalid job or connection inputs
+        W-->>C: <b>Reject before SSH</b>
+    else Valid controller inputs
+        W->>P: SSH, run mapped job
         alt SSH or remote execution fails
-            S-->>W: Non-zero exit
-            W-->>C: Throw; no local fallback
-        else remote stdout returns
-            P-->>S: Structured stdout
-            S-->>W: stdout
-            W-->>C: Return remote stdout unchanged
-            C->>V: parse_result(stdout, expected_job)
-            alt wrong job, wrong location, or ok != true
-                V-->>C: Reject result
-            else valid structured result
-                V-->>C: Parsed result
-                opt artifact digest supplied
-                    C->>V: verify_artifact(bytes, expected_sha256)
-                    alt digest mismatch
-                        V-->>C: false
-                    else digest matches
-                        V-->>C: true
-                    end
-                end
-            end
+            P-->>W: Non-zero exit
+            W-->>C: <b>Throw, no local fallback</b>
+        else Remote stdout returns
+            P-->>W: Structured stdout
+            W-->>C: <b>Return stdout unchanged</b>
         end
     end
+```
+
+## Caller validation: check the result before using it
+
+PowerShell returns stdout. The caller invokes Python validation separately, then verifies artifact bytes when it has an expected digest.
+
+```mermaid
+flowchart LR
+    R["<b>Remote stdout</b>"] --> V{"parse_result valid?"}
+    V -- No --> X["<b>Reject result</b>"]
+    V -- Yes --> P["<b>Parsed result</b>"]
+    classDef input fill:#e8e6df,stroke:#55534a,color:#20201d,stroke-width:2px;
+    classDef pass fill:#d2e5d8,stroke:#38734d,color:#183923,stroke-width:2px;
+    classDef stop fill:#f4dadd,stroke:#b14253,color:#611c29,stroke-width:2px;
+    class R,V input;
+    class P pass;
+    class X stop;
+```
+
+`parse_result()` checks the byte limit, JSON object, expected job, phone execution location, and `ok == true`. Optional artifact verification returns a boolean:
+
+```mermaid
+flowchart LR
+    A["<b>Bytes + expected SHA-256</b>"] --> H{"Digest matches?"}
+    H -- No --> F["<b>false</b>"]
+    H -- Yes --> T["<b>true</b>"]
+    classDef input fill:#e8e6df,stroke:#55534a,color:#20201d,stroke-width:2px;
+    classDef pass fill:#d2e5d8,stroke:#38734d,color:#183923,stroke-width:2px;
+    classDef stop fill:#f4dadd,stroke:#b14253,color:#611c29,stroke-width:2px;
+    class A,H input;
+    class T pass;
+    class F stop;
 ```
 
 ## Protocol at a glance
