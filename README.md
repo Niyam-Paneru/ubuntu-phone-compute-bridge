@@ -1,58 +1,84 @@
 # Ubuntu Phone Compute Bridge
 
-A bounded remote-compute protocol intended for a Windows controller and a phone-hosted Ubuntu environment. The repository demonstrates the controller, named-job contract, structured-result validation, and integrity checks; it does **not** prove or expose a live phone deployment.
+A bounded remote-compute protocol intended for a Windows controller and a phone-hosted Ubuntu environment. It exposes a reviewed named-job contract, structured result validation, and optional artifact integrity checks; it does **not** prove or expose a live phone deployment.
 
-![Protocol boundary diagram](docs/workflow.svg)
+The phone is allowed to fail. The controller is not allowed to improvise a Windows victory and call it remote compute.
 
-## What is implemented
+```mermaid
+sequenceDiagram
+    participant C as Caller
+    participant W as Windows controller
+    participant S as SSH boundary
+    participant P as phone-Ubuntu named job
+    participant V as caller-side Python
 
-- [`windows/Invoke-SafeUbuntuJob.ps1`](windows/Invoke-SafeUbuntuJob.ps1) accepts only four named jobs, requires explicit connection inputs, uses strict host-key checking, and throws on SSH failure.
-- [`src/compute_bridge/jobs.py`](src/compute_bridge/jobs.py) defines the matching public job registry.
-- [`src/compute_bridge/results.py`](src/compute_bridge/results.py) validates payload size, job identity, execution location, and `ok: true`.
-- [`src/compute_bridge/integrity.py`](src/compute_bridge/integrity.py) verifies optional SHA-256 artifact digests.
-
-The PowerShell example returns remote stdout as-is. It does **not** automatically call the Python validator, so verified success requires the caller to pass that payload through `parse_result(...)`.
-
-## Protocol example
-
-Request:
-
-```text
--Job health
+    C->>W: Request named job
+    alt job is not allowlisted
+        W-->>C: Reject before SSH
+    else allowlisted job
+        W->>S: ssh.exe + explicit connection inputs
+        S->>P: Run mapped named job
+        alt SSH or remote execution fails
+            S-->>W: Non-zero exit
+            W-->>C: Throw; no local fallback
+        else remote stdout returns
+            P-->>S: Structured stdout
+            S-->>W: stdout
+            W-->>C: Return remote stdout unchanged
+            C->>V: parse_result(stdout, expected_job)
+            alt wrong job, wrong location, or ok != true
+                V-->>C: Reject result
+            else valid structured result
+                V-->>C: Parsed result
+                opt artifact digest supplied
+                    C->>V: verify_artifact(bytes, expected_sha256)
+                    alt digest mismatch
+                        V-->>C: false
+                    else digest matches
+                        V-->>C: true
+                    end
+                end
+            end
+        end
+    end
 ```
 
-Synthetic valid result:
+## Protocol at a glance
 
-```json
-{"job":"health","execution_location":"phone-ubuntu","ok":true}
-```
-
-`parse_result(...)` accepts it only when the requested job is allowlisted, the payload is within 64 KiB, the job matches, the claimed execution location is exactly `phone-ubuntu`, and `ok` is exactly `true`.
+| Stage | Example / contract | Where it happens |
+|---|---|---|
+| Request | named job `health` | Windows controller accepts only the reviewed job set |
+| Transport | explicit host, user, port, identity file + strict host-key checking | PowerShell crosses the SSH boundary |
+| Remote result | `{"job":"health","execution_location":"phone-ubuntu","ok":true}` | named phone-Ubuntu job writes structured stdout |
+| Handoff | remote stdout is returned unchanged | PowerShell does **not** automatically validate the JSON |
+| Verification | `parse_result(..., expected_job="health")` | separate caller-side Python checks size, job, location, and `ok` |
+| Artifact integrity | SHA-256 comparison when an expected digest exists | caller-side `verify_artifact(...)` |
 
 ## Failure behavior
 
 | Failure | Result |
 |---|---|
-| unknown job | allowlist rejection |
-| missing identity file | stop before SSH |
+| unknown job | rejected before transport |
+| missing identity file | controller stops before SSH |
 | host-key mismatch | SSH refuses the connection |
-| non-zero SSH exit | controller throws; no local fallback |
-| wrong job/location, false `ok`, oversized result | `parse_result` rejects |
-| artifact digest mismatch | `verify_artifact` returns false |
+| SSH / remote non-zero exit | controller throws; there is no local fallback |
+| wrong job, wrong execution location, false `ok`, or oversized result | `parse_result(...)` rejects |
+| artifact digest mismatch | `verify_artifact(...)` returns false |
 
-Remote failure is never converted into a local Windows success path by this controller.
+## What to inspect
 
-## Verify
-
-```bash
-python -m compileall -q src
-PYTHONPATH=src python -m unittest discover -s tests -v
-```
-
-The tests cover the four-job allowlist, result identity/location checks, remote-failure rejection, the size bound, SHA-256 hashing, and tamper detection.
+| File | Role |
+|---|---|
+| `windows/Invoke-SafeUbuntuJob.ps1` | allowlisted Windows controller and explicit SSH boundary |
+| `src/compute_bridge/jobs.py` | public named-job registry |
+| `src/compute_bridge/results.py` | caller-side structured stdout validation |
+| `src/compute_bridge/integrity.py` | optional SHA-256 artifact verification |
+| `tests/` | allowlist, result identity/location, failure, size-bound, and digest checks |
 
 ## Scope
 
-No SSH key, password, device address, host fingerprint, router configuration, live endpoint, persistent worker service, or live phone-access claim is included.
+No SSH key, password, device address, host fingerprint, router configuration, live endpoint, persistent worker service, or claim of a currently reachable phone is included.
+
+Verification commands and expected checks: [docs/verification.md](docs/verification.md)
 
 See [job contract](docs/job-contract.md), [invariants](docs/invariants.md), [failure modes](docs/failure-modes.md), [security boundary](SECURITY.md), and [provenance](PROVENANCE.md).
