@@ -14,17 +14,17 @@ sequenceDiagram
     participant W as Windows controller
     participant P as Phone Ubuntu
 
-    C->>W: <b>Request named job</b>
+    C->>W: Request named job
     alt Invalid job or connection inputs
-        W-->>C: <b>Reject before SSH</b>
+        W-->>C: Reject before SSH
     else Valid controller inputs
         W->>P: SSH, run mapped job
         alt SSH or remote execution fails
             P-->>W: Non-zero exit
-            W-->>C: <b>Throw, no local fallback</b>
+            W-->>C: Throw, no local fallback
         else Remote stdout returns
             P-->>W: Structured stdout
-            W-->>C: <b>Return stdout unchanged</b>
+            W-->>C: Return stdout unchanged
         end
     end
 ```
