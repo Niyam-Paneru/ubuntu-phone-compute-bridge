@@ -1,124 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1140" role="img" aria-labelledby="title desc">
   <title id="title">Ubuntu phone compute bridge protocol boundaries</title>
-  <desc id="desc">System boundary diagram showing the Windows PowerShell controller, bounded SSH transport example, phone Ubuntu worker, separate Python result verification, optional artifact digest verification, and explicit failure paths without local fallback.</desc>
+  <desc id="desc">Four lanes show the Windows PowerShell controller, SSH transport, phone Ubuntu named scripts, and separate caller-side Python verification. Nonzero SSH exits throw; invalid results are rejected. Remote failure has no local fallback. This public contract is not a live deployment or an enforced job timeout.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d7dde8"/>
-    </marker>
-    <marker id="failArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff6b6b"/>
-    </marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#d7dde8"/></marker>
+    <marker id="failArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#ff6b6b"/></marker>
     <style>
-      .bg{fill:#0b0f14}.grid{stroke:#1b2430;stroke-width:1}.lane{fill:#101720;stroke:#344255;stroke-width:1.5}.boundary{stroke:#6f7f95;stroke-width:1.5;stroke-dasharray:8 8}.h1{fill:#f3f6fa;font:700 30px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.kicker{fill:#8ea0b8;font:600 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:2px}.label{fill:#f3f6fa;font:700 17px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.text{fill:#b8c3d2;font:14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.small{fill:#8ea0b8;font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.ok{fill:#9fe3b0}.warn{fill:#ffd479}.fail{fill:#ff8b8b}.code{fill:#d8e6ff;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.arrow{stroke:#d7dde8;stroke-width:2;fill:none;marker-end:url(#arrow)}.failLine{stroke:#ff6b6b;stroke-width:2;fill:none;marker-end:url(#failArrow)}.gate{fill:#161f2a;stroke:#6f7f95;stroke-width:1.5}.failure{fill:#211419;stroke:#ff6b6b;stroke-width:1.5}.sample{fill:#0d141d;stroke:#344255;stroke-width:1.5}
+      .bg{fill:#0b0f14}.lane{fill:#101720;stroke:#344255;stroke-width:1.5}.boundary{stroke:#6f7f95;stroke-width:1.5;stroke-dasharray:8 8}
+      .h1{fill:#f3f6fa;font:700 30px Arial,sans-serif}.kicker{fill:#a8b8ce;font:700 21px Arial,sans-serif;letter-spacing:.5px}
+      .label{fill:#f3f6fa;font:700 24px Arial,sans-serif}.text{fill:#c3cddb;font:22px Arial,sans-serif}.small{fill:#a8b8ce;font:21px Arial,sans-serif}
+      .code{fill:#d8e6ff;font:20px Consolas,monospace}.ok{fill:#9fe3b0}.warn{fill:#ffd479}.fail{fill:#ff8b8b}
+      .arrow{stroke:#d7dde8;stroke-width:2;fill:none;marker-end:url(#arrow)}.failLine{stroke:#ff6b6b;stroke-width:2;fill:none;marker-end:url(#failArrow)}
+      .gate{fill:#161f2a;stroke:#6f7f95;stroke-width:1.5}.failure{fill:#211419;stroke:#ff6b6b;stroke-width:1.5}.sample{fill:#0d141d;stroke:#344255;stroke-width:1.5}
     </style>
   </defs>
-
-  <rect class="bg" width="1440" height="900"/>
-  <g opacity="0.55">
-    <path class="grid" d="M0 120H1440M0 260H1440M0 400H1440M0 540H1440M0 680H1440M0 820H1440"/>
-    <path class="grid" d="M120 0V900M360 0V900M600 0V900M840 0V900M1080 0V900M1320 0V900"/>
-  </g>
-
-  <text x="56" y="54" class="kicker">PUBLIC SYSTEM / PROTOCOL BOUNDARY</text>
-  <text x="56" y="94" class="h1">Windows request → phone execution → explicit proof</text>
-  <text x="56" y="124" class="text">The repository demonstrates the contract. It does not publish a live phone endpoint, key, fingerprint, or worker daemon.</text>
-
-  <rect x="56" y="164" width="326" height="470" class="lane"/>
-  <rect x="410" y="164" width="270" height="470" class="lane"/>
-  <rect x="708" y="164" width="316" height="470" class="lane"/>
-  <rect x="1052" y="164" width="332" height="470" class="lane"/>
-
-  <text x="78" y="194" class="kicker">01 WINDOWS CONTROLLER</text>
-  <text x="432" y="194" class="kicker">02 TRANSPORT BOUNDARY</text>
-  <text x="730" y="194" class="kicker">03 PHONE UBUNTU WORKER</text>
-  <text x="1074" y="194" class="kicker">04 CALLER-SIDE VERIFICATION</text>
-
-  <text x="78" y="232" class="label">Invoke-SafeUbuntuJob.ps1</text>
-  <text x="78" y="262" class="text">-Job: health | python-smoke</text>
-  <text x="78" y="284" class="text">      benchmark | setup</text>
-  <text x="78" y="318" class="small">ValidateSet + fixed $jobScripts map</text>
-  <text x="78" y="342" class="small">No free-form command parameter</text>
-
-  <rect x="78" y="374" width="282" height="112" class="gate"/>
-  <text x="94" y="402" class="label">Target inputs are explicit</text>
-  <text x="94" y="428" class="text">HostAddress · User · Port</text>
-  <text x="94" y="452" class="text">IdentityFile must exist</text>
-  <text x="94" y="474" class="small">IPv4-only in this public example</text>
-
-  <text x="78" y="530" class="small">jobs.py also exposes registry metadata:</text>
-  <text x="78" y="552" class="code">JobSpec(name, description, max_seconds)</text>
-  <text x="78" y="578" class="small">max_seconds is contract metadata;</text>
-  <text x="78" y="598" class="small">the PowerShell example does not enforce it.</text>
-
-  <text x="432" y="232" class="label">SSH example</text>
-  <text x="432" y="262" class="text">BatchMode=yes</text>
-  <text x="432" y="284" class="text">StrictHostKeyChecking=yes</text>
-  <text x="432" y="306" class="text">ConnectTimeout=5</text>
-  <text x="432" y="328" class="text">ServerAliveInterval=10</text>
-  <text x="432" y="350" class="text">ServerAliveCountMax=2</text>
-
-  <path d="M545 376 l72 54 -72 54 -72 -54 z" class="gate"/>
-  <text x="545" y="424" text-anchor="middle" class="label">ssh exit 0?</text>
-  <text x="545" y="448" text-anchor="middle" class="small">remote command returned</text>
-
-  <text x="432" y="530" class="small">Attended setup assumption:</text>
-  <text x="432" y="552" class="text">operator supplies target + identity</text>
-  <text x="432" y="578" class="small">No address, key, or fingerprint ships here.</text>
-
-  <text x="730" y="232" class="label">Reviewed named script runs</text>
-  <text x="730" y="262" class="text">health        → JSON proof</text>
-  <text x="730" y="284" class="text">python-smoke  → Python + value</text>
-  <text x="730" y="306" class="text">benchmark     → elapsed value</text>
-  <text x="730" y="328" class="text">setup         → tool check</text>
-
-  <rect x="730" y="374" width="272" height="112" class="gate"/>
-  <text x="746" y="402" class="label">Structured stdout</text>
-  <text x="746" y="430" class="code">{ "job": ...,</text>
-  <text x="746" y="452" class="code">  "execution_location":</text>
-  <text x="746" y="474" class="code">  "phone-ubuntu", "ok": true }</text>
-
-  <text x="730" y="530" class="small">Public slice shows command mapping + result</text>
-  <text x="730" y="552" class="small">contract; it does not expose a persistent</text>
-  <text x="730" y="574" class="small">remote service or live access path.</text>
-
-  <text x="1074" y="232" class="label">parse_result(payload, expected_job)</text>
-  <text x="1074" y="264" class="text">1. expected job is allowlisted</text>
-  <text x="1074" y="288" class="text">2. UTF-8 payload ≤ 64 KiB</text>
-  <text x="1074" y="312" class="text">3. JSON object</text>
-  <text x="1074" y="336" class="text">4. job == requested job</text>
-  <text x="1074" y="360" class="text">5. location == phone-ubuntu</text>
-  <text x="1074" y="384" class="text">6. ok is exactly true</text>
-
-  <path d="M1218 410 l72 54 -72 54 -72 -54 z" class="gate"/>
-  <text x="1218" y="458" text-anchor="middle" class="label">proof valid?</text>
-  <text x="1218" y="482" text-anchor="middle" class="small">otherwise reject</text>
-
-  <rect x="1074" y="540" width="286" height="70" class="gate"/>
-  <text x="1090" y="568" class="label">Optional artifact check</text>
-  <text x="1090" y="592" class="code">verify_artifact(bytes, sha256)</text>
-
-  <path d="M382 290 H410" class="arrow"/>
-  <text x="396" y="278" text-anchor="middle" class="small">named job</text>
-  <path d="M680 290 H708" class="arrow"/>
-  <text x="694" y="278" text-anchor="middle" class="small">reviewed script</text>
-  <path d="M1024 430 H1052" class="arrow"/>
-  <text x="1038" y="416" text-anchor="middle" class="small">stdout</text>
-
-  <line x1="1038" y1="164" x2="1038" y2="634" class="boundary"/>
-  <text x="1031" y="620" text-anchor="end" class="small">PowerShell emits raw remote stdout</text>
-  <text x="1059" y="620" class="small">Python verifier is a separate component</text>
-
-  <path d="M545 484 V684" class="failLine"/>
-  <text x="558" y="644" class="fail">nonzero SSH exit → throw</text>
-  <path d="M1218 518 V684" class="failLine"/>
-  <text x="1231" y="644" class="fail">mismatch / false / oversize → reject</text>
-  <rect x="410" y="690" width="974" height="74" class="failure"/>
-  <text x="432" y="720" class="label fail">REMOTE FAILURE REMAINS FAILURE</text>
-  <text x="432" y="746" class="text">No branch in this public controller runs the job locally on Windows after remote failure.</text>
-
-  <rect x="56" y="792" width="1328" height="76" class="sample"/>
-  <text x="78" y="818" class="kicker">SYNTHETIC CONTRACT EXAMPLE</text>
-  <text x="78" y="846" class="code">request selection: -Job health</text>
-  <text x="420" y="846" class="code">remote stdout: {"job":"health","execution_location":"phone-ubuntu","ok":true}</text>
-  <text x="1110" y="846" class="code ok">parse_result(...) → accept</text>
+  <rect class="bg" width="1440" height="1140"/>
+  <text x="56" y="48" class="kicker">PUBLIC SYSTEM / PROTOCOL BOUNDARY</text>
+  <text x="56" y="88" class="h1">Windows request → phone execution → explicit proof</text>
+  <text x="56" y="126" class="text">Contract example: no live phone endpoint, key, fingerprint, or worker daemon is published.</text>
+  <rect x="56" y="164" width="326" height="714" class="lane"/>
+  <rect x="410" y="164" width="270" height="714" class="lane"/>
+  <rect x="708" y="164" width="316" height="714" class="lane"/>
+  <rect x="1052" y="164" width="332" height="714" class="lane"/>
+  <text x="78" y="198" class="kicker">01 WINDOWS CONTROLLER</text>
+  <text x="432" y="198" class="kicker">02 SSH TRANSPORT</text>
+  <text x="730" y="198" class="kicker">03 PHONE UBUNTU</text>
+  <text x="1074" y="198" class="kicker">04 CALLER VERIFICATION</text>
+  <text x="78" y="244" class="code">Invoke-SafeUbuntuJob.ps1</text>
+  <text x="78" y="280" class="text">-Job: health | python-smoke</text>
+  <text x="78" y="310" class="text">benchmark | setup</text>
+  <text x="78" y="352" class="small">ValidateSet + fixed scripts</text>
+  <text x="78" y="382" class="small">No free-form command</text>
+  <rect x="78" y="422" width="282" height="172" class="gate"/>
+  <text x="94" y="456" class="label">Explicit target inputs</text>
+  <text x="94" y="492" class="text">HostAddress · User · Port</text>
+  <text x="94" y="526" class="text">IdentityFile must exist</text>
+  <text x="94" y="562" class="small">Public example: IPv4 only</text>
+  <text x="78" y="638" class="small">jobs.py registry: JobSpec</text>
+  <text x="78" y="668" class="small">name, description,</text>
+  <text x="78" y="698" class="small">max_seconds</text>
+  <text x="78" y="762" class="small warn">max_seconds is metadata.</text>
+  <text x="78" y="792" class="small">PowerShell does not enforce</text>
+  <text x="78" y="822" class="small">a job runtime limit.</text>
+  <text x="432" y="244" class="label">SSH example</text>
+  <text x="432" y="280" class="text">BatchMode=yes</text>
+  <text x="432" y="310" class="text">StrictHostKeyChecking</text>
+  <text x="432" y="340" class="text">=yes</text>
+  <text x="432" y="376" class="text">ConnectTimeout=5</text>
+  <text x="432" y="406" class="text">ServerAliveInterval=10</text>
+  <text x="432" y="436" class="text">ServerAliveCountMax=2</text>
+  <path d="M545 466 l100 70 -100 70 -100 -70z" class="gate"/>
+  <text x="545" y="528" text-anchor="middle" class="label">ssh exit 0?</text>
+  <text x="545" y="560" text-anchor="middle" class="small ok">yes: stdout</text>
+  <text x="432" y="638" class="small">Attended setup:</text>
+  <text x="432" y="668" class="small">operator supplies target</text>
+  <text x="432" y="698" class="small">and identity.</text>
+  <text x="432" y="792" class="small">No address, key, or</text>
+  <text x="432" y="822" class="small">fingerprint ships here.</text>
+  <text x="730" y="244" class="label">Reviewed scripts</text>
+  <text x="730" y="280" class="text">health → JSON proof</text>
+  <text x="730" y="310" class="text">python-smoke → Python + 4</text>
+  <text x="730" y="340" class="text">benchmark → elapsed value</text>
+  <text x="730" y="370" class="text">setup → tool check</text>
+  <rect x="730" y="422" width="272" height="208" class="gate"/>
+  <text x="746" y="456" class="label">Structured stdout</text>
+  <text x="746" y="492" class="code">{ "job": ...,</text>
+  <text x="746" y="522" class="code">"execution_location":</text>
+  <text x="746" y="552" class="code">"phone-ubuntu",</text>
+  <text x="746" y="582" class="code">"ok": true }</text>
+  <text x="730" y="668" class="small">Command mapping + result</text>
+  <text x="730" y="698" class="small">contract; no remote service.</text>
+  <text x="730" y="792" class="small">PowerShell emits raw stdout.</text>
+  <text x="730" y="822" class="small">It does not call parse_result.</text>
+  <text x="1074" y="244" class="code">parse_result(payload,</text>
+  <text x="1074" y="274" class="code">  expected_job=...)</text>
+  <text x="1074" y="316" class="text">1. Expected job allowlisted</text>
+  <text x="1074" y="346" class="text">2. UTF-8 payload ≤ 64 KiB</text>
+  <text x="1074" y="376" class="text">3. JSON object</text>
+  <text x="1074" y="406" class="text">4. Job matches request</text>
+  <text x="1074" y="436" class="text">5. Location: phone-ubuntu</text>
+  <text x="1074" y="466" class="text">6. ok is exactly true</text>
+  <path d="M1218 490 l100 70 -100 70 -100 -70z" class="gate"/>
+  <text x="1218" y="554" text-anchor="middle" class="label">proof valid?</text>
+  <text x="1218" y="584" text-anchor="middle" class="small ok">yes: accept</text>
+  <rect x="1074" y="654" width="286" height="110" class="gate"/>
+  <text x="1090" y="686" class="label" style="font-size:22px">Optional digest check</text>
+  <text x="1090" y="718" class="code">verify_artifact(bytes,</text>
+  <text x="1090" y="748" class="code">  sha256)</text>
+  <text x="1074" y="816" class="small">Separate Python component.</text>
+  <text x="1074" y="846" class="small">Caller must invoke it.</text>
+  <path d="M360 718 H410" class="arrow"/>
+  <text x="78" y="728" class="small">named job →</text>
+  <path d="M658 744 H708" class="arrow"/>
+  <text x="432" y="752" class="small">reviewed script →</text>
+  <path d="M1002 744 H1052" class="arrow"/>
+  <text x="730" y="752" class="small">raw stdout → caller</text>
+  <line x1="1038" y1="164" x2="1038" y2="878" class="boundary"/>
+  <path d="M645 536 H668 V926 H566 V936" class="failLine"/>
+  <text x="648" y="524" class="small fail">no</text>
+  <text x="432" y="906" class="small fail">nonzero exit → throw</text>
+  <path d="M1318 560 H1372 V936" class="failLine"/>
+  <text x="1330" y="548" class="small fail">no</text>
+  <text x="1066" y="906" class="small fail">mismatch / false / oversize</text>
+  <text x="1066" y="934" class="small fail">→ reject</text>
+  <rect x="410" y="942" width="974" height="58" class="failure"/>
+  <text x="432" y="978" class="text fail">Remote failure remains failure. The controller has no local Windows fallback.</text>
+  <rect x="56" y="1026" width="1328" height="86" class="sample"/>
+  <text x="78" y="1058" class="kicker">SYNTHETIC CONTRACT EXAMPLE</text>
+  <text x="78" y="1092" class="text">-Job health → stdout with job=health, execution_location=phone-ubuntu, ok=true → parse_result accepts</text>
 </svg>
