@@ -61,16 +61,7 @@ flowchart LR
     class F stop;
 ```
 
-## Protocol at a glance
-
-| Stage | Example / contract | Where it happens |
-|---|---|---|
-| Request | named job `health` | Windows controller accepts only the reviewed job set |
-| Transport | explicit host, user, port, identity file + strict host-key checking | PowerShell crosses the SSH boundary |
-| Remote result | `{"job":"health","execution_location":"phone-ubuntu","ok":true}` | named phone-Ubuntu job writes structured stdout |
-| Handoff | remote stdout is returned unchanged | PowerShell does **not** automatically validate the JSON |
-| Verification | `parse_result(..., expected_job="health")` | separate caller-side Python checks size, job, location, and `ok` |
-| Artifact integrity | SHA-256 comparison when an expected digest exists | caller-side `verify_artifact(...)` |
+The controller accepts only reviewed named jobs, such as `health`, and uses an explicit SSH host, user, port, identity file, and strict host-key checking. A result can be `{"job":"health","execution_location":"phone-ubuntu","ok":true}`; returning that stdout does not automatically validate it.
 
 ## Failure behavior
 
