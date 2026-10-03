@@ -9,7 +9,17 @@ This public sample comes from my private remote-compute experiments. It exposes 
 ## Transport: remote failure stays a failure
 
 ```mermaid
+---
+config:
+  sequence:
+    actorMargin: 50
+    messageMargin: 28
+    mirrorActors: false
+    wrap: false
+---
 sequenceDiagram
+    accTitle: Transport: remote failure stays a failure
+    accDescr: Sequence for transport: remote failure stays a failure.
     participant C as Caller
     participant W as Windows controller
     participant P as Phone Ubuntu
@@ -34,13 +44,22 @@ sequenceDiagram
 PowerShell returns stdout. The caller invokes Python validation separately, then verifies artifact bytes when it has an expected digest.
 
 ```mermaid
+---
+config:
+  flowchart:
+    curve: linear
+    nodeSpacing: 28
+    rankSpacing: 42
+---
 flowchart LR
-    R["<b>Remote stdout</b>"] --> V{"parse_result valid?"}
-    V -- No --> X["<b>Reject result</b>"]
-    V -- Yes --> P["<b>Parsed result</b>"]
-    classDef input fill:#e8e6df,stroke:#55534a,color:#20201d,stroke-width:2px;
-    classDef pass fill:#d2e5d8,stroke:#38734d,color:#183923,stroke-width:2px;
-    classDef stop fill:#f4dadd,stroke:#b14253,color:#611c29,stroke-width:2px;
+    accTitle: Caller validation: check the result before using it
+    accDescr: Decision flow for caller validation: check the result before using it.
+    R["Remote stdout"] --> V{"parse_result valid?"}
+    V -- No --> X["Reject result"]
+    V -- Yes --> P["Parsed result"]
+    classDef input stroke-width:1.5px;
+    classDef pass stroke-width:2.5px;
+    classDef stop stroke-width:2px,stroke-dasharray:5 3;
     class R,V input;
     class P pass;
     class X stop;
@@ -49,13 +68,22 @@ flowchart LR
 `parse_result()` checks the byte limit, JSON object, expected job, phone execution location, and `ok == true`. Optional artifact verification returns a boolean:
 
 ```mermaid
+---
+config:
+  flowchart:
+    curve: linear
+    nodeSpacing: 28
+    rankSpacing: 42
+---
 flowchart LR
-    A["<b>Bytes + expected SHA-256</b>"] --> H{"Digest matches?"}
-    H -- No --> F["<b>false</b>"]
-    H -- Yes --> T["<b>true</b>"]
-    classDef input fill:#e8e6df,stroke:#55534a,color:#20201d,stroke-width:2px;
-    classDef pass fill:#d2e5d8,stroke:#38734d,color:#183923,stroke-width:2px;
-    classDef stop fill:#f4dadd,stroke:#b14253,color:#611c29,stroke-width:2px;
+    accTitle: Caller validation: check the result before using it
+    accDescr: Decision flow for caller validation: check the result before using it.
+    A["Bytes + expected SHA-256"] --> H{"Digest matches?"}
+    H -- No --> F["false"]
+    H -- Yes --> T["true"]
+    classDef input stroke-width:1.5px;
+    classDef pass stroke-width:2.5px;
+    classDef stop stroke-width:2px,stroke-dasharray:5 3;
     class A,H input;
     class T pass;
     class F stop;
