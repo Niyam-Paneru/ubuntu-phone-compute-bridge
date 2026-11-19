@@ -1,10 +1,17 @@
 # Ubuntu Phone Compute Bridge
 
-A bounded remote-compute protocol for a Windows controller and a phone-hosted Ubuntu environment: reviewed named jobs, structured results, and optional artifact integrity checks.
+A Windows computer asks a phone running Ubuntu to do a named job. If the phone fails, the controller must report failure — **not quietly run it locally and pretend the phone succeeded**.
 
-**The phone may fail. A victory quietly computed on Windows does not count.**
+This protocol includes named-job allowlists, SSH handoff, structured result checks, and optional SHA-256 artifact validation. My laptop doesn't need to cosplay as a supercomputer to report the truth.
 
-This public sample comes from my private remote-compute experiments. It exposes the controller and result contract for review. I can build and adapt the surrounding job workflows, device setup, and application integrations; this repo makes no claim that a phone is currently reachable.
+**Try it / check the behavior:**
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s tests -v
+```
+
+No credentials, configured device, or proof of a currently reachable phone is included. [Verification](docs/verification.md).
 
 ## Transport: remote failure stays a failure
 
