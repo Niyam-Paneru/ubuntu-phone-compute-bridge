@@ -18,13 +18,65 @@ The caller then validates that stdout separately:
 
 An honest failure is better than a forged victory. Especially when the forged victory was calculated by the laptop that couldn't handle the job in the first place.
 
-## Run the public checks
+## When the phone doesn't answer
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests -v
+The controller never quietly pretends the local computer did a remote job.
+
+```mermaid
+---
+config:
+  sequence:
+    actorMargin: 50
+    messageMargin: 28
+    mirrorActors: false
+    wrap: false
+---
+sequenceDiagram
+    accTitle: Transport: remote failure stays a failure
+    accDescr: Sequence for transport: remote failure stays a failure.
+    participant C as Caller
+    participant W as Windows controller
+    participant P as Phone Ubuntu
+
+    C->>W: Request named job
+    alt Invalid job or connection inputs
+        W-->>C: Reject before SSH
+    else Valid controller inputs
+        W->>P: SSH, run mapped job
+        alt SSH or remote execution fails
+            P-->>W: Non-zero exit
+            W-->>C: Throw, no local fallback
+        else Remote stdout returns
+            P-->>W: Structured stdout
+            W-->>C: Return stdout unchanged
+        end
+    end
 ```
 
-Read the [job registry](src/compute_bridge/jobs.py), [result parser](src/compute_bridge/results.py), [hash verification](src/compute_bridge/integrity.py), and [job contract](docs/job-contract.md).
+The caller validates the result separately rather than assuming that any stdout is success.
+
+```mermaid
+---
+config:
+  flowchart:
+    curve: linear
+    nodeSpacing: 28
+    rankSpacing: 42
+---
+flowchart LR
+    accTitle: Caller validation: check the result before using it
+    accDescr: Decision flow for caller validation: check the result before using it.
+    R["Remote stdout"] --> V{"parse_result valid?"}
+    V -- No --> X["Reject result"]
+    V -- Yes --> P["Parsed result"]
+    classDef input stroke-width:1.5px;
+    classDef pass stroke-width:2.5px;
+    classDef stop stroke-width:2px,stroke-dasharray:5 3;
+    class R,V input;
+    class P pass;
+    class X stop;
+```
+
+The [tests and setup notes](docs/verification.md) cover failed SSH, wrong job identities, and digest mismatches. Read the [job registry](src/compute_bridge/jobs.py), [result parser](src/compute_bridge/results.py), [hash verification](src/compute_bridge/integrity.py), and [job contract](docs/job-contract.md).
 
 This repo **doesn't include** a reachable phone, live worker, keys, IP addresses, or evidence that a current device is online. It's the controller/result contract and tests. [Verification](docs/verification.md) · [security](SECURITY.md).
