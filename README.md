@@ -53,29 +53,7 @@ sequenceDiagram
     end
 ```
 
-The caller validates the result separately rather than assuming that any stdout is success.
-
-```mermaid
----
-config:
-  flowchart:
-    curve: linear
-    nodeSpacing: 28
-    rankSpacing: 42
----
-flowchart LR
-    accTitle: Caller validation: check the result before using it
-    accDescr: Decision flow for caller validation: check the result before using it.
-    R["Remote stdout"] --> V{"parse_result valid?"}
-    V -- No --> X["Reject result"]
-    V -- Yes --> P["Parsed result"]
-    classDef input stroke-width:1.5px;
-    classDef pass stroke-width:2.5px;
-    classDef stop stroke-width:2px,stroke-dasharray:5 3;
-    class R,V input;
-    class P pass;
-    class X stop;
-```
+The returned stdout is *not* a success certificate. The caller separately checks JSON size, job identity, execution location, success state, and the expected artifact digest. All of those checks are documented above; another two-box diagram would add nothing.
 
 The [tests and setup notes](docs/verification.md) cover failed SSH, wrong job identities, and digest mismatches. Read the [job registry](src/compute_bridge/jobs.py), [result parser](src/compute_bridge/results.py), [hash verification](src/compute_bridge/integrity.py), and [job contract](docs/job-contract.md).
 
