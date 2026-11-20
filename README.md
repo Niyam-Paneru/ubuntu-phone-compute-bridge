@@ -1,12 +1,10 @@
 # Ubuntu Phone Compute Bridge
 
-My laptop is not powerful enough to treat every experiment like a data-center job. I wondered: could the phone run a bounded Ubuntu task instead?
+My laptop doesn't have unlimited patience (or memory). My phone has a processor and spends a suspicious amount of its day showing me videos. Could it do a little actual work?
 
-That sounded sensible until I imagined the laptop doing the work locally and labeling the result **“computed on phone.”** Congratulations, I've invented remote-compute cosplay.
+This Windows-to-phone controller runs a bounded Ubuntu job over SSH and checks the result contract. If the laptop does the computation and puts the phone's name on the report, that isn't remote compute. That's group homework.
 
-So this controller insists on a real SSH job and a verifiable remote-result contract. No secret local understudy.
-
-This repo contains a bounded Windows-to-phone **controller and result contract**, not a publicly running compute service.
+This is a controller and result contract, not a publicly running compute service.
 
 ## The phone gets the credit only if it did the work
 
