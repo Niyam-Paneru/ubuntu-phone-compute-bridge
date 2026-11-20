@@ -1,8 +1,10 @@
 # Ubuntu Phone Compute Bridge
 
-My Windows laptop and heavy computation have a complicated relationship. So I experimented with using a phone-hosted Ubuntu environment as a remote worker.
+My Windows laptop is not exactly begging for more computationally expensive hobbies. So I experimented with sending bounded jobs to Ubuntu running on my phone.
 
-The rule was simple: **the laptop is not allowed to do the work locally and then put “phone” on the receipt.** That would make a very impressive benchmark of the wrong device.
+Then came the boring but important question: **what if the laptop quietly does the work locally and claims the phone did it?** Impressive remote-compute demo. Zero remote compute.
+
+The controller refuses to make up that receipt.
 
 This repo contains a bounded Windows-to-phone **controller and result contract**, not a publicly running compute service.
 
@@ -23,7 +25,7 @@ The [PowerShell controller](windows/Invoke-SafeUbuntuJob.ps1) accepts reviewed j
 
 Read the [job registry](src/compute_bridge/jobs.py), [result parser](src/compute_bridge/results.py), [integrity check](src/compute_bridge/integrity.py), [job contract](docs/job-contract.md), and [verification cases](docs/verification.md).
 
-## The phone is not in the box
+## What I didn't put in this repo
 
 There are **no live worker credentials, keys, IP addresses, reachable phone, or proof of a currently online device** here. This is the controller, validation logic, and tests. The SSH transport alone doesn't authenticate a claimed job result beyond the configured checks; a real deployment still needs to protect its execution environment.
 
