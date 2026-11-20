@@ -1,60 +1,30 @@
 # Ubuntu Phone Compute Bridge
 
-My Windows machine is not exactly a workstation built for heavy compute. I experimented with having a phone-hosted Ubuntu environment run named jobs instead.
+My Windows laptop and heavy computation have a complicated relationship. So I experimented with using a phone-hosted Ubuntu environment as a remote worker.
 
-But there was one rule I cared about: **if the phone didn't do the work, don't tell me the phone did the work.** A local fallback disguised as remote success would make the whole experiment pointless.
+The rule was simple: **the laptop is not allowed to do the work locally and then put “phone” on the receipt.** That would make a very impressive benchmark of the wrong device.
 
-## What travels between the machines
+This repo contains a bounded Windows-to-phone **controller and result contract**, not a publicly running compute service.
 
-The Windows [PowerShell controller](windows/Invoke-SafeUbuntuJob.ps1) accepts reviewed job names, makes an SSH request with explicit host/user/port/key and host-key checking, and returns remote stdout. It doesn't substitute a local result if SSH fails.
+## The trip to the phone
 
-The caller then validates that stdout separately:
+The [PowerShell controller](windows/Invoke-SafeUbuntuJob.ps1) accepts reviewed job names and explicit SSH settings (host, user, port, key, and host-key checks). It requests a named remote job and returns stdout; the caller validates the result separately.
 
-- It's valid JSON and within the size limit.
-- It names the **expected job**.
-- `execution_location` says `phone-ubuntu`.
-- `ok` really is `true`.
-- If an artifact digest is supplied, its SHA-256 matches the bytes.
+| Check | Why it matters |
+| --- | --- |
+| Job name is on the reviewed list | No surprise arbitrary commands |
+| SSH and host-key verification succeed | We contacted the intended remote endpoint |
+| Stdout is valid JSON and within the size limit | A gigantic stack trace isn't a result |
+| Response names the expected job | Nobody swaps the homework halfway through |
+| Execution location says phone-ubuntu and success is true | The laptop doesn't steal the phone's medal |
+| Provided artifact digest matches SHA-256 | The bytes are the bytes we expected |
 
-An honest failure is better than a forged victory. Especially when the forged victory was calculated by the laptop that couldn't handle the job in the first place.
+**SSH failure stays failure.** There is no secret Windows fallback, and returned stdout is not automatically trusted as a success certificate.
 
-## When the phone doesn't answer
+Read the [job registry](src/compute_bridge/jobs.py), [result parser](src/compute_bridge/results.py), [integrity check](src/compute_bridge/integrity.py), [job contract](docs/job-contract.md), and [verification cases](docs/verification.md).
 
-The controller never quietly pretends the local computer did a remote job.
+## The phone is not in the box
 
-```mermaid
----
-config:
-  sequence:
-    actorMargin: 50
-    messageMargin: 28
-    mirrorActors: false
-    wrap: false
----
-sequenceDiagram
-    accTitle: Transport: remote failure stays a failure
-    accDescr: Sequence for transport: remote failure stays a failure.
-    participant C as Caller
-    participant W as Windows controller
-    participant P as Phone Ubuntu
+There are **no live worker credentials, keys, IP addresses, reachable phone, or proof of a currently online device** here. This is the controller, validation logic, and tests. The SSH transport alone doesn't authenticate a claimed job result beyond the configured checks; a real deployment still needs to protect its execution environment.
 
-    C->>W: Request named job
-    alt Invalid job or connection inputs
-        W-->>C: Reject before SSH
-    else Valid controller inputs
-        W->>P: SSH, run mapped job
-        alt SSH or remote execution fails
-            P-->>W: Non-zero exit
-            W-->>C: Throw, no local fallback
-        else Remote stdout returns
-            P-->>W: Structured stdout
-            W-->>C: Return stdout unchanged
-        end
-    end
-```
-
-The returned stdout is *not* a success certificate. The caller separately checks JSON size, job identity, execution location, success state, and the expected artifact digest. All of those checks are documented above; another two-box diagram would add nothing.
-
-The [tests and setup notes](docs/verification.md) cover failed SSH, wrong job identities, and digest mismatches. Read the [job registry](src/compute_bridge/jobs.py), [result parser](src/compute_bridge/results.py), [hash verification](src/compute_bridge/integrity.py), and [job contract](docs/job-contract.md).
-
-This repo **doesn't include** a reachable phone, live worker, keys, IP addresses, or evidence that a current device is online. It's the controller/result contract and tests. [Verification](docs/verification.md) · [security](SECURITY.md).
+I wanted extra compute, not an elaborate way for my laptop to lie on its résumé. [Security boundary](SECURITY.md).
